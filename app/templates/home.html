@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 {
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .real {
+            color: green;
+        }
+        .fake {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📰 Fake News Detector</h1>
+        <textarea id="newsInput" placeholder="Paste the news text here..."></textarea>
+        <button onclick="predictNews()">Predict</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        function predictNews() {
+            const newsText = document.getElementById('newsInput').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!newsText) {
+                resultDiv.innerHTML = '<span style="color: orange;">Please enter some text!</span>';
+                return;
+            }
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: newsText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.prediction === 'Real') {
+                    resultDiv.innerHTML = '<span class="real">✅ This news appears to be REAL!</span>';
+                } else {
+                    resultDiv.innerHTML = '<span class="fake">❌ Warning: This news might be FAKE!</span>';
+                }
+            })
+            .catch(error => {
+                resultDiv.innerHTML = '<span style="color: red;">An error occurred. Please try again later.</span>';
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
